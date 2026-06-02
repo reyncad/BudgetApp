@@ -1,0 +1,52 @@
+@model IEnumerable<BudgetApp.Models.Kategori>
+@{
+    ViewData["Title"] = "Kategoriler";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0">Kategoriler</h4>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Yeni Kategori
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5 text-muted">
+                    <p>Henüz kategori yok.</p>
+                    <a asp-action="Create" class="btn btn-sm btn-outline-primary">İlk kategoriyi ekle</a>
+                </div>
+            }
+            else
+            {
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Kategori Adı</th>
+                            <th>Harcama Sayısı</th>
+                            <th class="text-center">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var k in Model)
+                        {
+                            <tr>
+                                <td>@k.Id</td>
+                                <td>@k.Ad</td>
+                                <td><span class="badge bg-info text-dark">@k.Harcamalar.Count</span></td>
+                                <td class="text-center">
+                                    <a asp-action="Edit" asp-route-id="@k.Id" class="btn btn-sm btn-outline-primary me-1">Düzenle</a>
+                                    <a asp-action="Delete" asp-route-id="@k.Id" class="btn btn-sm btn-outline-danger">Sil</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</div>
