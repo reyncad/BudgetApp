@@ -15,17 +15,34 @@ public class HarcamaController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int? ay, int? yil, int? kategoriId)
     {
-        var harcamalar = await _context.Harcamalar
+        int secilenYil = yil ?? DateTime.Today.Year;
+        int secilenAy  = ay  ?? DateTime.Today.Month;
+
+        var query = _context.Harcamalar
             .Include(h => h.Kategori)
-            .OrderByDescending(h => h.Tarih)
+            .Where(h => h.Tarih.Year == secilenYil && h.Tarih.Month == secilenAy);
+
+        if (kategoriId.HasValue)
+            query = query.Where(h => h.KategoriId == kategoriId.Value);
+
+        var harcamalar = await query.OrderByDescending(h => h.Tarih).ToListAsync();
+
+        // Bütçe limiti kontrolü: o aydaki kategori bazlı harcamalar
+        var kategoriler = await _context.Kategoriler
+            .Include(k => k.Harcamalar.Where(h => h.Tarih.Year == secilenYil && h.Tarih.Month == secilenAy))
             .ToListAsync();
 
-        ViewBag.ToplamHarcama = harcamalar.Sum(h => h.Miktar);
-        ViewBag.BuAyHarcama = harcamalar
-            .Where(h => h.Tarih.Month == DateTime.Today.Month && h.Tarih.Year == DateTime.Today.Year)
-            .Sum(h => h.Miktar);
+        ViewBag.SecilenAy    = secilenAy;
+        ViewBag.SecilenYil   = secilenYil;
+        ViewBag.SecilenKatId = kategoriId;
+        ViewBag.Kategoriler  = new SelectList(await _context.Kategoriler.ToListAsync(), "Id", "Ad", kategoriId);
+        ViewBag.Toplam       = harcamalar.Sum(h => h.Miktar);
+        ViewBag.LimitUyarilari = kategoriler
+            .Where(k => k.AylikLimit.HasValue && k.Harcamalar.Sum(h => h.Miktar) > k.AylikLimit.Value)
+            .Select(k => new { k.Ad, Harcanan = k.Harcamalar.Sum(h => h.Miktar), k.AylikLimit })
+            .ToList<dynamic>();
 
         return View(harcamalar);
     }
@@ -63,7 +80,6 @@ public class HarcamaController : Controller
     public async Task<IActionResult> Edit(int id, Harcama harcama)
     {
         if (id != harcama.Id) return NotFound();
-
         if (ModelState.IsValid)
         {
             _context.Update(harcama);

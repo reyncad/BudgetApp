@@ -1,0 +1,37 @@
+@model BudgetApp.Models.Gelir
+@{
+    ViewData["Title"] = "Gelir Sil";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Geliri Sil</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Bu gelir kaydını silmek istediğinizden emin misiniz?</p>
+                    <dl class="row">
+                        <dt class="col-5">Açıklama</dt>
+                        <dd class="col-7">@Model.Açıklama</dd>
+                        <dt class="col-5">Miktar</dt>
+                        <dd class="col-7 text-success fw-bold">@Model.Miktar.ToString("C2", tr)</dd>
+                        <dt class="col-5">Tarih</dt>
+                        <dd class="col-7">@Model.Tarih.ToString("dd.MM.yyyy")</dd>
+                        <dt class="col-5">Tip</dt>
+                        <dd class="col-7">@Model.Tip</dd>
+                    </dl>
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

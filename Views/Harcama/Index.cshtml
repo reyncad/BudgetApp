@@ -1,43 +1,87 @@
 @model IEnumerable<BudgetApp.Models.Harcama>
 @{
     ViewData["Title"] = "Harcamalar";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+    int ay  = ViewBag.SecilenAy;
+    int yil = ViewBag.SecilenYil;
 }
 
 <div class="container mt-4">
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card border-danger">
-                <div class="card-body text-center">
-                    <h6 class="card-title text-muted">Toplam Harcama</h6>
-                    <h3 class="text-danger">@ViewBag.ToplamHarcama.ToString("C2", new System.Globalization.CultureInfo("tr-TR"))</h3>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="mb-0 fw-semibold"><i class="bi bi-receipt text-danger me-2"></i>Harcamalar</h4>
+        <a asp-action="Create" class="btn btn-danger btn-sm">
+            <i class="bi bi-plus-lg"></i> Harcama Ekle
+        </a>
+    </div>
+
+    <form method="get" class="card border-0 shadow-sm mb-3">
+        <div class="card-body py-2">
+            <div class="row g-2 align-items-center">
+                <div class="col-auto">
+                    <select name="ay" class="form-select form-select-sm" style="width:130px" onchange="this.form.submit()">
+                        @for (int m = 1; m <= 12; m++)
+                        {
+                            <option value="@m" selected="@(m == ay)">
+                                @(new DateTime(2000, m, 1).ToString("MMMM", new System.Globalization.CultureInfo("tr-TR")))
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select name="yil" class="form-select form-select-sm" style="width:90px" onchange="this.form.submit()">
+                        @for (int y = DateTime.Today.Year; y >= DateTime.Today.Year - 3; y--)
+                        {
+                            <option value="@y" selected="@(y == yil)">@y</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <select name="kategoriId" class="form-select form-select-sm" style="width:170px" onchange="this.form.submit()">
+                        <option value="">Tüm Kategoriler</option>
+                        @foreach (SelectListItem item in ViewBag.Kategoriler)
+                        {
+                            <option value="@item.Value" selected="@item.Selected">@item.Text</option>
+                        }
+                    </select>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card border-warning">
-                <div class="card-body text-center">
-                    <h6 class="card-title text-muted">Bu Ay</h6>
-                    <h3 class="text-warning">@ViewBag.BuAyHarcama.ToString("C2", new System.Globalization.CultureInfo("tr-TR"))</h3>
-                </div>
+    </form>
+
+    @{
+        var uyarilar = (System.Collections.IEnumerable)ViewBag.LimitUyarilari;
+        bool uyariVar = false;
+        foreach (var _ in uyarilar) { uyariVar = true; break; }
+    }
+    @if (uyariVar)
+    {
+        <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center gap-2 mb-3">
+            <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+            <div>
+                <strong>Bütçe Uyarısı:</strong>
+                @foreach (var u in (IEnumerable<dynamic>)ViewBag.LimitUyarilari)
+                {
+                    <span class="me-3">@u.Ad — @((decimal)u.Harcanan).ToString("C0", tr) / @((decimal)(decimal?)u.AylikLimit).ToString("C0", tr)</span>
+                }
             </div>
         </div>
-        <div class="col-md-4 d-flex align-items-center justify-content-center">
-            <a asp-action="Create" class="btn btn-primary btn-lg">
-                <i class="bi bi-plus-lg"></i> Yeni Harcama
-            </a>
+    }
+
+    <div class="card border-0 shadow-sm mb-3">
+        <div class="card-body py-2 px-4 d-flex justify-content-between align-items-center bg-danger bg-opacity-10 rounded">
+            <span class="fw-medium">Dönem Toplam Harcama</span>
+            <span class="fs-5 fw-bold text-danger">@((decimal)ViewBag.Toplam).ToString("C2", tr)</span>
         </div>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Harcama Listesi</h5>
-        </div>
+    <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
             @if (!Model.Any())
             {
                 <div class="text-center py-5 text-muted">
-                    <p>Henüz harcama kaydı yok.</p>
-                    <a asp-action="Create" class="btn btn-sm btn-outline-primary">İlk harcamayı ekle</a>
+                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                    Bu dönemde harcama kaydı yok.
+                    <div class="mt-2"><a asp-action="Create" class="btn btn-sm btn-outline-danger">Harcama Ekle</a></div>
                 </div>
             }
             else
@@ -57,10 +101,10 @@
                             @foreach (var h in Model)
                             {
                                 <tr>
-                                    <td>@h.Tarih.ToString("dd.MM.yyyy")</td>
+                                    <td class="text-muted small">@h.Tarih.ToString("dd.MM.yyyy")</td>
                                     <td>@h.Açıklama</td>
                                     <td><span class="badge bg-secondary">@h.Kategori?.Ad</span></td>
-                                    <td class="text-end fw-bold text-danger">@h.Miktar.ToString("C2", new System.Globalization.CultureInfo("tr-TR"))</td>
+                                    <td class="text-end fw-bold text-danger">@h.Miktar.ToString("C2", tr)</td>
                                     <td class="text-center">
                                         <a asp-action="Edit" asp-route-id="@h.Id" class="btn btn-sm btn-outline-primary me-1">Düzenle</a>
                                         <a asp-action="Delete" asp-route-id="@h.Id" class="btn btn-sm btn-outline-danger">Sil</a>
