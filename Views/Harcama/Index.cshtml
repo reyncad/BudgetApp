@@ -61,7 +61,7 @@
                 <strong>Bütçe Uyarısı:</strong>
                 @foreach (var u in (IEnumerable<dynamic>)ViewBag.LimitUyarilari)
                 {
-                    <span class="me-3">@u.Ad — @((decimal)u.Harcanan).ToString("C0", tr) / @((decimal)(decimal?)u.AylikLimit).ToString("C0", tr)</span>
+                    <span class="me-3">@u.Ad — @(((decimal)u.Harcanan).ToString("C0", tr)) / @(((decimal)(decimal?)u.AylikLimit).ToString("C0", tr))</span>
                 }
             </div>
         </div>

@@ -79,10 +79,13 @@
                                             };
                                         }
                                         <span class="badge bg-@tipRenk text-@(tipRenk == "warning" ? "dark" : "white")">
-                                            @g.Tip.GetType().GetField(g.Tip.ToString())
-                                              ?.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.DisplayAttribute), false)
-                                              ?.Cast<System.ComponentModel.DataAnnotations.DisplayAttribute>()
-                                              ?.FirstOrDefault()?.Name ?? g.Tip.ToString()
+                                            @(g.Tip switch {
+                                                BudgetApp.Models.GelirTipi.Maas => "Maaş",
+                                                BudgetApp.Models.GelirTipi.Freelance => "Freelance",
+                                                BudgetApp.Models.GelirTipi.KiraGeliri => "Kira Geliri",
+                                                BudgetApp.Models.GelirTipi.Yatirim => "Yatırım",
+                                                _ => "Diğer"
+                                            })
                                         </span>
                                     </td>
                                     <td class="text-end fw-bold text-success">@(g.Miktar.ToString("C2", tr))</td>
