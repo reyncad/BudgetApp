@@ -3,83 +3,89 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Bütçe Takip</title>
+    <title>@ViewData["Title"] — Bütçe Takip</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <style>
-        body { background-color: #f5f6fa; }
-        .navbar-brand { letter-spacing: -0.5px; }
-        .nav-link.active { font-weight: 600; }
-        .card { border-radius: 12px; }
-    </style>
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark shadow-sm mb-4">
-            <div class="container">
-                <a class="navbar-brand fw-bold" asp-controller="Home" asp-action="Index">
-                    <i class="bi bi-wallet2 me-1"></i>Bütçe Takip
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Menü">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-speedometer2 me-1"></i>Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Harcama" asp-action="Index">
-                                <i class="bi bi-arrow-up-circle me-1"></i>Harcamalar
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Gelir" asp-action="Index">
-                                <i class="bi bi-arrow-down-circle me-1"></i>Gelirler
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Kategori" asp-action="Index">
-                                <i class="bi bi-tags me-1"></i>Kategoriler
-                            </a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav gap-2">
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-sm btn-outline-danger px-3" asp-controller="Harcama" asp-action="Create">
-                                <i class="bi bi-dash-circle me-1"></i>Gider
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link btn btn-sm btn-outline-success px-3" asp-controller="Gelir" asp-action="Create">
-                                <i class="bi bi-plus-circle me-1"></i>Gelir
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
+<div class="app-wrapper">
 
-    <div class="container">
-        <main role="main" class="pb-5">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top py-3 mt-4 bg-white">
-        <div class="container text-center text-muted small">
-            &copy; 2026 Bütçe Takip
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">💰</div>
+            <div class="brand-name">Bütçe Takip</div>
+            <div class="brand-sub">Kişisel Finans</div>
         </div>
-    </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+        <nav class="sidebar-nav">
+            <div class="nav-section-label">Genel</div>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")"
+               asp-controller="Home" asp-action="Index">
+                <i class="bi bi-grid-1x2-fill"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="nav-section-label">İşlemler</div>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Harcama" ? "active" : "")"
+               asp-controller="Harcama" asp-action="Index">
+                <i class="bi bi-arrow-up-right-circle-fill"></i>
+                <span>Harcamalar</span>
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Gelir" ? "active" : "")"
+               asp-controller="Gelir" asp-action="Index">
+                <i class="bi bi-arrow-down-left-circle-fill"></i>
+                <span>Gelirler</span>
+            </a>
+
+            <div class="nav-section-label">Planlama</div>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Hedef" ? "active" : "")"
+               asp-controller="Hedef" asp-action="Index">
+                <i class="bi bi-bullseye"></i>
+                <span>Hedefler</span>
+            </a>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Butce" ? "active" : "")"
+               asp-controller="Butce" asp-action="Index">
+                <i class="bi bi-sliders"></i>
+                <span>Bütçe Limitleri</span>
+            </a>
+
+            <div class="nav-section-label">Ayarlar</div>
+            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Kategori" ? "active" : "")"
+               asp-controller="Kategori" asp-action="Index">
+                <i class="bi bi-tag-fill"></i>
+                <span>Kategoriler</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a asp-controller="Gelir" asp-action="Create" class="sidebar-quick-btn btn-gelir">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>Gelir Ekle</span>
+            </a>
+            <a asp-controller="Harcama" asp-action="Create" class="sidebar-quick-btn btn-harcama">
+                <i class="bi bi-dash-circle-fill"></i>
+                <span>Harcama Ekle</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-content">
+        <div class="topbar">
+            <div class="topbar-title">@(ViewData["Title"] ?? "Dashboard")</div>
+        </div>
+        <div class="page-body">
+            @RenderBody()
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

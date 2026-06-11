@@ -1,0 +1,129 @@
+@model IEnumerable<BudgetApp.Models.Hedef>
+@{
+    ViewData["Title"] = "Hedefler";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <div class="text-muted" style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px">Tasarruf Planı</div>
+        <div style="font-size:20px;font-weight:700;color:#1e293b">Hedeflerim</div>
+    </div>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Yeni Hedef
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="card">
+        <div class="empty-state">
+            <i class="bi bi-bullseye" style="font-size:48px;opacity:.3;display:block;margin-bottom:12px"></i>
+            Henüz hedef yok
+            <div class="mt-3"><a asp-action="Create" class="btn btn-sm btn-primary">İlk Hedefi Ekle</a></div>
+        </div>
+    </div>
+}
+else
+{
+    int toplam     = Model.Count();
+    int tamamlanan = Model.Count(h => h.Tamamlandi);
+    decimal toplamHedef   = Model.Sum(h => h.HedefMiktar);
+    decimal toplamBirikis = Model.Sum(h => h.BirikmisMiktar);
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+            <div class="card text-center" style="border-left:4px solid #6366f1!important">
+                <div class="card-body py-3">
+                    <div class="text-muted" style="font-size:11px;font-weight:600;text-transform:uppercase">Aktif Hedef</div>
+                    <div style="font-size:28px;font-weight:700;color:#6366f1">@(toplam - tamamlanan)</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card text-center" style="border-left:4px solid #10b981!important">
+                <div class="card-body py-3">
+                    <div class="text-muted" style="font-size:11px;font-weight:600;text-transform:uppercase">Tamamlanan</div>
+                    <div style="font-size:28px;font-weight:700;color:#10b981">@tamamlanan</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="card text-center" style="border-left:4px solid #f59e0b!important">
+                <div class="card-body py-3">
+                    <div class="text-muted" style="font-size:11px;font-weight:600;text-transform:uppercase">Toplam Birikim</div>
+                    <div style="font-size:22px;font-weight:700;color:#f59e0b">@(toplamBirikis.ToString("C0", tr))</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        @foreach (var h in Model)
+        {
+            string renk = h.Tamamlandi ? "#10b981" : h.YuzdeOran >= 75 ? "#6366f1" : h.YuzdeOran >= 40 ? "#f59e0b" : "#94a3b8";
+            string bgRenk = h.Tamamlandi ? "#f0fdf4" : "#fafafa";
+
+            <div class="col-md-6">
+                <div class="card" style="background:@bgRenk;border-left:4px solid @renk!important">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <div style="font-weight:700;font-size:15px;color:#1e293b">
+                                    @if (h.Tamamlandi) { <text>✅ </text> }
+                                    @h.Ad
+                                </div>
+                                @if (!string.IsNullOrEmpty(h.Aciklama))
+                                {
+                                    <div class="text-muted" style="font-size:12px">@h.Aciklama</div>
+                                }
+                            </div>
+                            <div class="d-flex gap-1">
+                                <a asp-action="Edit" asp-route-id="@h.Id" class="btn btn-sm btn-outline-primary" style="padding:3px 10px">Düzenle</a>
+                                <a asp-action="Delete" asp-route-id="@h.Id" class="btn btn-sm btn-outline-danger" style="padding:3px 10px">Sil</a>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-1" style="font-size:13px">
+                            <span style="font-weight:600;color:@renk">@(h.BirikmisMiktar.ToString("C0", tr))</span>
+                            <span class="text-muted">@(h.HedefMiktar.ToString("C0", tr))</span>
+                        </div>
+                        <div class="progress mb-3" style="height:8px">
+                            <div class="progress-bar" style="width:@h.YuzdeOran%;background:@renk;border-radius:99px"></div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div style="font-size:12px;color:#64748b">
+                                @if (h.Tamamlandi)
+                                {
+                                    <span class="fw-semibold" style="color:#10b981">Hedefe ulaşıldı! 🎉</span>
+                                }
+                                else
+                                {
+                                    <span>Kalan: <strong>@(h.KalanMiktar.ToString("C0", tr))</strong></span>
+                                    @if (h.HedefTarihi.HasValue)
+                                    {
+                                        int kalanGun = (int)(h.HedefTarihi.Value - DateTime.Today).TotalDays;
+                                        <span class="ms-2 @(kalanGun < 30 ? "text-danger" : "")">· @kalanGun gün kaldı</span>
+                                    }
+                                }
+                            </div>
+                            <span class="badge" style="background:@(renk)22;color:@renk;font-size:12px;padding:4px 10px">%@h.YuzdeOran</span>
+                        </div>
+
+                        @if (!h.Tamamlandi)
+                        {
+                            <form asp-action="ParaEkle" asp-route-id="@h.Id" method="post" class="d-flex gap-2 mt-3">
+                                @Html.AntiForgeryToken()
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text" style="font-size:12px">₺</span>
+                                    <input type="number" name="miktar" class="form-control" placeholder="Eklenecek tutar" min="1" step="0.01" style="font-size:12px" />
+                                </div>
+                                <button type="submit" class="btn btn-sm" style="background:@renk;color:#fff;white-space:nowrap;font-size:12px">Para Ekle</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

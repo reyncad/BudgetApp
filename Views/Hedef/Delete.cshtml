@@ -1,0 +1,31 @@
+@model BudgetApp.Models.Hedef
+@{
+    ViewData["Title"] = "Hedef Sil";
+    var tr = new System.Globalization.CultureInfo("tr-TR");
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7">
+        <div class="card" style="border-left:4px solid #ef4444!important">
+            <div class="card-header" style="color:#ef4444">Hedefi Sil</div>
+            <div class="card-body">
+                <p class="text-muted" style="font-size:13px">Bu hedefi silmek istediğinizden emin misiniz?</p>
+                <dl class="row" style="font-size:13px">
+                    <dt class="col-5">Hedef Adı</dt>
+                    <dd class="col-7 fw-semibold">@Model.Ad</dd>
+                    <dt class="col-5">Hedef Miktar</dt>
+                    <dd class="col-7">@(Model.HedefMiktar.ToString("C0", tr))</dd>
+                    <dt class="col-5">Birikim</dt>
+                    <dd class="col-7" style="color:#10b981;font-weight:600">@(Model.BirikmisMiktar.ToString("C0", tr))</dd>
+                </dl>
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <div class="d-flex gap-2 mt-3">
+                        <button type="submit" class="btn btn-danger flex-grow-1">Evet, Sil</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">İptal</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

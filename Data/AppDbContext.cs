@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<Kategori> Kategoriler { get; set; }
     public DbSet<Harcama> Harcamalar { get; set; }
     public DbSet<Gelir> Gelirler { get; set; }
+    public DbSet<Hedef> Hedefler { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
