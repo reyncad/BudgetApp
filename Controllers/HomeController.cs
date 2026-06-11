@@ -38,8 +38,8 @@ public class HomeController : Controller
         for (int i = 5; i >= 0; i--)
         {
             var t = new DateTime(secilenYil, secilenAy, 1).AddMonths(-i);
-            var ayGelir   = await _context.Gelirler.Where(g => g.Tarih.Year == t.Year && g.Tarih.Month == t.Month).SumAsync(g => (decimal?)g.Miktar) ?? 0;
-            var ayHarcama = await _context.Harcamalar.Where(h => h.Tarih.Year == t.Year && h.Tarih.Month == t.Month).SumAsync(h => (decimal?)h.Miktar) ?? 0;
+            var ayGelir   = (await _context.Gelirler.Where(g => g.Tarih.Year == t.Year && g.Tarih.Month == t.Month).ToListAsync()).Sum(g => g.Miktar);
+            var ayHarcama = (await _context.Harcamalar.Where(h => h.Tarih.Year == t.Year && h.Tarih.Month == t.Month).ToListAsync()).Sum(h => h.Miktar);
             aylikOzet.Add(new { Etiket = t.ToString("MMM yy"), Gelir = ayGelir, Harcama = ayHarcama });
         }
 
